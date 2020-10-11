@@ -1,34 +1,45 @@
-const {
-  db,
-  creatNewUser,
-  removeUser,
-  findUser,
-  updateUser
-} = require('../../dataBase/dataBase');
-// const User = require('./user.model');
+const DB = require('../../common/dataBase');
 
 const getAll = async () => {
-  // TODO: mock implementation. should be replaced during task development
-  return db.Users;
+  const users = await DB.getAllUsers();
+
+  if (!users) {
+    throw new Error('The users was not found');
+  }
+
+  return users;
 };
 
-const update = (id, user) => {
-  updateUser(id, user);
-  return db.Users;
+const update = async (id, user) => {
+  const userUp = await DB.updateUser(id, user);
+
+  if (!userUp) {
+    throw new Error(`The user with ${id} was not found`);
+  }
+
+  return userUp;
 };
 
 const getId = async id => {
-  return findUser(id);
+  const user = await DB.getUser(id);
+
+  if (!user) {
+    throw new Error(`The user with ${id} was not found`);
+  }
+
+  return user;
 };
 
 const remove = async id => {
-  removeUser(id);
-  return db.Users;
+  const user = await DB.getUser(id);
+  if (!user) {
+    throw new Error(`The user with ${id} was not found`);
+  }
+  await DB.removeUser(id);
 };
 
-const creat = async user => {
-  creatNewUser(user);
-  return db.Users;
+const create = async user => {
+  return DB.createUser(user);
 };
 
-module.exports = { getAll, creat, getId, remove, update };
+module.exports = { getAll, create, getId, remove, update };

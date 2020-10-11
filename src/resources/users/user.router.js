@@ -9,8 +9,12 @@ router.route('/').get(async (req, res) => {
 });
 
 router.route('/:id').get(async (req, res) => {
-  const user = await usersService.getId(req.params.id);
-  res.status(200).send(User.toResponse(user));
+  try {
+    const user = await usersService.getId(req.params.id);
+    res.json(User.toResponse(user));
+  } catch (error) {
+    res.status(404).send(error.message);
+  }
 });
 
 router.route('/:id').put(async (req, res) => {
@@ -18,17 +22,21 @@ router.route('/:id').put(async (req, res) => {
     req.params.id,
     User.fromRequest(req.body)
   );
-  res.status(200).send(User.toResponse(user));
+  res.json(User.toResponse(user));
 });
 
 router.route('/:id').delete(async (req, res) => {
-  const users = await usersService.remove(req.params.id);
-  res.status(200).send(users.map(User.toResponse));
+  try {
+    await usersService.remove(req.params.id);
+    res.sendStatus(200);
+  } catch (error) {
+    res.status(404).send(error.message);
+  }
 });
 
 router.route('/').post(async (req, res) => {
-  const user = await usersService.creat(User.fromRequest(req.body));
-  res.status(200).send(User.toResponse(user));
+  const user = await usersService.create(User.fromRequest(req.body));
+  res.json(User.toResponse(user));
 });
 
 module.exports = router;

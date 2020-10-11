@@ -9,8 +9,8 @@ const remove = id => usersRepo.remove(id);
 
 const update = (id, user) => usersRepo.update(id, user);
 
-const creat = user => {
-  return usersRepo.creat(new User(user));
+const create = user => {
+  return usersRepo.create(new User(user));
 };
 
-module.exports = { getAll, creat, getId, remove, update };
+module.exports = { getAll, create, getId, remove, update };
