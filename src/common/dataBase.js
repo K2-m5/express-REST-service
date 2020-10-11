@@ -1,7 +1,13 @@
+const Board = require('../resources/boards/board.model');
 const User = require('../resources/users/user.model');
 
 const DB = {
-  Users: []
+  Users: [],
+  Boards: []
+};
+
+const getAll = () => {
+  return DB.Boards.slice(0);
 };
 
 const getAllUsers = () => {
@@ -44,9 +50,17 @@ const removeUser = id => {
 const DBInit = () => {
   for (let i = 0; i < 3; i += 1) {
     DB.Users.push(new User());
+    DB.Boards.push(new Board());
   }
 };
 
 DBInit();
 
-module.exports = { getAllUsers, createUser, removeUser, getUser, updateUser };
+module.exports = {
+  getAll,
+  getAllUsers,
+  createUser,
+  removeUser,
+  getUser,
+  updateUser
+};
