@@ -24,9 +24,8 @@ class Board {
   }
 
   static fromRequest(board) {
-    const { id, title, columns } = board;
+    const { title, columns } = board;
     return {
-      id,
       title,
       columns
     };

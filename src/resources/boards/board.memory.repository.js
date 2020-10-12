@@ -12,13 +12,31 @@ const create = async board => {
 };
 
 const getId = async id => {
-  const user = await DB.getId(NAME_DB, id);
+  const board = await DB.getId(NAME_DB, id);
 
-  if (!user) {
-    throw new Error(`The user with ${id} was not found`);
+  if (!board) {
+    throw new Error(`The board with ${id} was not found`);
   }
 
-  return user;
+  return board;
 };
 
-module.exports = { getAll, create, getId };
+const update = async (id, data) => {
+  const board = await DB.updateBoard(NAME_DB, id, data);
+
+  if (!board) {
+    throw new Error(`The board with ${id} was not found`);
+  }
+
+  return { board };
+};
+
+const remove = async id => {
+  const board = await DB.getId(NAME_DB, id);
+  if (!board) {
+    throw new Error(`The board with ${id} was not found`);
+  }
+  await DB.remove(NAME_DB, id);
+};
+
+module.exports = { getAll, create, getId, update, remove };
