@@ -28,9 +28,9 @@ router.route('/:id').put(async (req, res) => {
 router.route('/:id').delete(async (req, res) => {
   try {
     await usersService.remove(req.params.id);
-    res.sendStatus(200);
+    res.status(200).send('The user has been deleted');
   } catch (error) {
-    res.status(404).send(error.message);
+    res.status(404).send('User not found');
   }
 });
 
