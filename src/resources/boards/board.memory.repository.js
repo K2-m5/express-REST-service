@@ -11,4 +11,14 @@ const create = async board => {
   return DB.create(NAME_DB, new Boards(board));
 };
 
-module.exports = { getAll, create };
+const getId = async id => {
+  const user = await DB.getId(NAME_DB, id);
+
+  if (!user) {
+    throw new Error(`The user with ${id} was not found`);
+  }
+
+  return user;
+};
+
+module.exports = { getAll, create, getId };

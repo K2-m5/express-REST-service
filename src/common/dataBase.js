@@ -15,6 +15,10 @@ const create = (nameDB, data) => {
   return data;
 };
 
+const getId = (nameDB, id) => {
+  return DB[nameDB].find(item => item.id === id);
+};
+
 const getAllUsers = () => {
   return DB.Users.slice(0);
 };
@@ -64,6 +68,7 @@ DBInit();
 module.exports = {
   getAll,
   create,
+  getId,
   getAllUsers,
   createUser,
   removeUser,

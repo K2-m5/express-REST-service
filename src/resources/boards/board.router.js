@@ -12,4 +12,13 @@ router.route('/').post(async (req, res) => {
   res.json(Board.toResponse(board));
 });
 
+router.route('/:id').get(async (req, res) => {
+  try {
+    const board = await boardService.getId(req.params.id);
+    res.json(Board.toResponse(board));
+  } catch (error) {
+    res.status(404).send(error.message);
+  }
+});
+
 module.exports = router;
