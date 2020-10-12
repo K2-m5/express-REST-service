@@ -7,4 +7,9 @@ router.route('/').get(async (req, res) => {
   res.json(boards.map(Board.toResponse));
 });
 
+router.route('/').post(async (req, res) => {
+  const board = await boardService.create(Board.fromRequest(req.body));
+  res.json(Board.toResponse(board));
+});
+
 module.exports = router;

@@ -6,8 +6,13 @@ const DB = {
   Boards: []
 };
 
-const getAll = () => {
-  return DB.Boards.slice(0);
+const getAll = nameBD => {
+  return DB[nameBD].slice(0);
+};
+
+const create = (nameDB, data) => {
+  DB[nameDB].push(data);
+  return data;
 };
 
 const getAllUsers = () => {
@@ -58,6 +63,7 @@ DBInit();
 
 module.exports = {
   getAll,
+  create,
   getAllUsers,
   createUser,
   removeUser,
