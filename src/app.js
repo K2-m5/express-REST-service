@@ -5,6 +5,8 @@ const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
 const boardsRouter = require('./resources/boards/board.router');
 const tasksRouter = require('./resources/tasks/task.router');
+const { morgan, logger } = require('./middleware/logger');
+const { returnError } = require('./errorHandler/errorHandler');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -21,13 +23,21 @@ app.use('/', (req, res, next) => {
   next();
 });
 
+app.use(
+  morgan(
+    ':method :status :url query=:query body=:body size :res[content-length] - :response-time ms',
+    {
+      stream: logger.stream
+    }
+  )
+);
+
 app.use('/users', userRouter);
 app.use('/boards', boardsRouter);
 app.use('/boards', tasksRouter);
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broken!');
+  returnError(err, res);
   next();
 });
 
