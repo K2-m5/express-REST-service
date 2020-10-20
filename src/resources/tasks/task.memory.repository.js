@@ -5,14 +5,7 @@ const getAll = async id => DB.getAllTasks(id);
 
 const create = async task => DB.create(NAME_DB, task);
 
-const getId = async (boardId, taskId) => {
-  const task = await DB.getTask(boardId, taskId);
-
-  if (!task) {
-    throw new Error(`Task with id ${taskId} was not found`);
-  }
-  return task;
-};
+const getId = async (boardId, taskId) => DB.getTask(boardId, taskId);
 
 const update = async (boardId, taskId, taskData) =>
   DB.updateTask(boardId, taskId, taskData);
