@@ -21,7 +21,7 @@ router.route('/').get(
     res.statusMessage = STATUS_CODE[HttpStatus.OK].all;
     res.contentType = 'application/json';
     res
-      .json(users.map(User.toResponse))
+      .json(users.map(User))
       .status(HttpStatus.OK)
       .end();
     next();
@@ -105,7 +105,7 @@ router.route('/:id').delete(
 
 router.route('/').post(
   catchError(async (req, res, next) => {
-    const user = await usersService.create(User.fromRequest(req.body));
+    const user = await usersService.create(req.body);
     res.statusMessage = STATUS_CODE[HttpStatus.OK].update;
     res.contentType = 'application/json';
     res

@@ -11,6 +11,16 @@ const { returnError } = require('./errorHandler/errorHandler');
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
+process
+  .on('unhandledRejection', reason => {
+    logger.error(`Unhandled Rejection at Promise: ${reason.message}`);
+    process.exitCode = 1;
+  })
+  .on('uncaughtException', error => {
+    logger.error(`Uncaught Exception: ${error}`);
+    process.exitCode = 1;
+  });
+
 app.use(express.json());
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
