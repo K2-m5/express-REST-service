@@ -10,20 +10,19 @@ const getId = async id => {
 };
 
 const create = async boardData => {
-  console.log(Board.create(boardData));
-  return await Board.create(boardData);
+  return Board.create(boardData);
 };
 
 const update = async (_id, boardData) => {
-  return await Board.updateOne({ _id }, boardData);
+  return Board.updateOne({ _id }, boardData);
 };
 
 const remove = async id => {
-  const board = await Board.findById(id);
+  const board = await getId(id);
   if (board) {
     await tasksRepo.deleteTaskByBoardId(id);
     await board.remove();
-    return;
+    return board;
   }
   return false;
 };
