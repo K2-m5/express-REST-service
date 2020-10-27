@@ -1,4 +1,4 @@
-const boardRepo = require('./board.memory.repository');
+const boardRepo = require('./board.db.repository');
 
 const getAll = () => boardRepo.getAll();
 
@@ -6,10 +6,16 @@ const create = board => {
   return boardRepo.create(board);
 };
 
-const getId = id => boardRepo.getId(id);
+const getId = id => {
+  return boardRepo.getId(id);
+};
 
-const update = (id, data) => boardRepo.update(id, data);
+const update = (id, data) => {
+  return boardRepo.update(id, data);
+};
 
-const remove = id => boardRepo.remove(id);
+const remove = id => {
+  return boardRepo.remove(id);
+};
 
 module.exports = { getAll, create, getId, update, remove };

@@ -32,7 +32,7 @@ router.route('/:id/tasks').get(
       res.statusMessage = STATUS_CODE[HttpStatus.OK].all;
       res.contentType = 'application/json';
       res
-        .json(tasks.map(Task.toResponse))
+        .json(tasks.map(item => Task.toResponse(item)))
         .status(HttpStatus.OK)
         .end();
     }
@@ -48,7 +48,7 @@ router.route('/:boardId/tasks/:taskId').get(
       throw new ErrorHandler(HttpStatus.BAD_REQUEST);
     }
 
-    const task = await tasksService.getId(boardId, taskId);
+    const task = await tasksService.getId(taskId, boardId);
     if (!task) {
       throw new ErrorHandler(
         HttpStatus.NOT_FOUND,
@@ -66,25 +66,15 @@ router.route('/:boardId/tasks/:taskId').get(
   })
 );
 
-router.route('/:id/tasks').post(
+router.route('/:boardId/tasks').post(
   catchError(async (req, res, next) => {
-    const { title, order, description, userId, columnId } = req.body;
-    const boardId = req.params.id;
+    const newData = req.body;
+    const boardId = req.params.boardId;
     if (!boardId || !isUUID(boardId)) {
       throw new ErrorHandler(HttpStatus.BAD_REQUEST);
     }
 
-    const task = await tasksService.create(
-      new Task({
-        title,
-        order,
-        description,
-        userId,
-        boardId,
-        columnId
-      })
-    );
-
+    const task = await tasksService.create(newData, boardId);
     res.statusMessage = STATUS_CODE[HttpStatus.OK].create;
     res.contentType = 'application/json';
     res
@@ -104,15 +94,7 @@ router.route('/:boardId/tasks/:taskId').put(
       throw new ErrorHandler(HttpStatus.BAD_REQUEST);
     }
 
-    const task = await tasksService.update(boardId, taskId, {
-      title: newTaskData.title,
-      order: newTaskData.order,
-      description: newTaskData.description,
-      userId: newTaskData.userId,
-      boardId: newTaskData.boardId,
-      columnId: newTaskData.columnId
-    });
-
+    const task = await tasksService.update(taskId, boardId, newTaskData);
     if (!task) {
       throw new ErrorHandler(
         HttpStatus.NOT_FOUND,
@@ -138,7 +120,7 @@ router.route('/:boardId/tasks/:taskId').delete(
       throw new ErrorHandler(HttpStatus.BAD_REQUEST);
     }
 
-    const deleteCount = await tasksService.remove(boardId, taskId);
+    const deleteCount = await tasksService.remove(taskId, boardId);
     if (deleteCount === 0) {
       throw new ErrorHandler(
         HttpStatus.NOT_FOUND,
