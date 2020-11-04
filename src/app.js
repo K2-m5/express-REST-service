@@ -6,7 +6,8 @@ const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
 const boardsRouter = require('./resources/boards/board.router');
 const tasksRouter = require('./resources/tasks/task.router');
-// const loginRouter = require('./resources/login/login.router');
+const loginRouter = require('./resources/login/login.router');
+const login = require('./resources/login/login.router');
 
 const { morgan, logger } = require('./middleware/logger');
 const { returnError } = require('./errorHandler/errorHandler');
@@ -37,10 +38,11 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-app.use('/users', userRouter);
-app.use('/boards', boardsRouter);
-app.use('/boards', tasksRouter);
-// app.use('/login', loginRouter);
+app.use('/users', login, userRouter);
+app.use('/boards', login, boardsRouter);
+app.use('/boards', login, tasksRouter);
+app.use('/login', loginRouter);
+app.use('*', login);
 
 app.use((err, req, res, next) => {
   returnError(err, res);

@@ -11,10 +11,10 @@ const { createLogger, format, transports } = require('winston');
 
 const logger = new createLogger({
   transports: [
-    new transports.Console({
-      level: 'info',
-      format: format.combine(format.colorize(), format.cli())
-    }),
+    // new transports.Console({
+    //   level: 'info',
+    //   format: format.combine(format.colorize(), format.cli())
+    // }),
     new transports.File({
       filename: './logs/error.log',
       level: 'error',

@@ -27,10 +27,17 @@ const remove = async id => {
   return false;
 };
 
+const getLogin = async login => {
+  const user = await User.findOne({ login });
+
+  return user;
+};
+
 module.exports = {
   getAll,
   getId,
   create,
   update,
-  remove
+  remove,
+  getLogin
 };
