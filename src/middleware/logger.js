@@ -27,6 +27,7 @@ const logger = new createLogger({
     })
   ]
 });
+
 logger.stream = {
   write(message) {
     const mesChunk = message.split(' ');
@@ -38,5 +39,15 @@ logger.stream = {
     }
   }
 };
+
+process
+  .on('unhandledRejection', reason => {
+    logger.error(`Unhandled Rejection at Promise: ${reason.message}`);
+    process.exitCode = 1;
+  })
+  .on('uncaughtException', error => {
+    logger.error(`Uncaught Exception: ${error}`);
+    process.exitCode = 1;
+  });
 
 module.exports = { morgan, logger };
