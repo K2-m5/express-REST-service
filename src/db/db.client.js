@@ -1,15 +1,20 @@
+/* eslint-disable no-sync */
 const mongoose = require('mongoose');
-const { MONGO_CONNECTION_STRING } = require('../common/config');
+const { SALT, MONGO_CONNECTION_STRING } = require('../common/config');
+const bcrypt = require('bcrypt');
+
 const User = require('../resources/users/user.model');
 const Board = require('../resources/boards/board.model');
 const Task = require('../resources/tasks/task.model');
 
+const hash = bcrypt.hashSync('admin', parseInt(SALT, 10));
+
 const users = [
   new User({
     id: 'bc41de77-0721-4df4-aaad-18e0555ba84b',
-    name: 'USER',
-    login: 'user',
-    password: 'P@55w0rd'
+    name: 'John',
+    login: 'admin',
+    password: hash
   })
 ];
 
@@ -50,6 +55,7 @@ const boards = [
     ]
   })
 ];
+
 const tasks = [
   new Task({
     title: 'Test',

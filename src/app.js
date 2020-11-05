@@ -2,36 +2,21 @@ const express = require('express');
 const swaggerUI = require('swagger-ui-express');
 const path = require('path');
 const YAML = require('yamljs');
+
 const userRouter = require('./resources/users/user.router');
 const boardsRouter = require('./resources/boards/board.router');
 const tasksRouter = require('./resources/tasks/task.router');
+const authRouter = require('./resources/login/login.router');
+
 const { morgan, logger } = require('./middleware/logger');
 const { returnError } = require('./errorHandler/errorHandler');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 
-process
-  .on('unhandledRejection', reason => {
-    logger.error(`Unhandled Rejection at Promise: ${reason.message}`);
-    process.exitCode = 1;
-  })
-  .on('uncaughtException', error => {
-    logger.error(`Uncaught Exception: ${error}`);
-    process.exitCode = 1;
-  });
-
 app.use(express.json());
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-
-app.use('/', (req, res, next) => {
-  if (req.originalUrl === '/') {
-    res.send('Service is running!');
-    return;
-  }
-  next();
-});
 
 app.use(
   morgan(
@@ -41,6 +26,16 @@ app.use(
     }
   )
 );
+
+app.use('/', (req, res, next) => {
+  if (req.originalUrl === '/') {
+    res.send('Service is running!');
+    return;
+  }
+  next();
+});
+
+authRouter(app);
 
 app.use('/users', userRouter);
 app.use('/boards', boardsRouter);

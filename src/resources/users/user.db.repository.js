@@ -9,6 +9,8 @@ const getId = async id => {
   return User.findById(id);
 };
 
+const getByKey = async (key, value) => User.findOne({ [key]: value });
+
 const create = async userData => {
   return User.create(userData);
 };
@@ -27,10 +29,17 @@ const remove = async id => {
   return false;
 };
 
+const getLogin = async login => {
+  const user = await User.findOne({ login });
+  return user;
+};
+
 module.exports = {
   getAll,
   getId,
+  getByKey,
   create,
   update,
-  remove
+  remove,
+  getLogin
 };
