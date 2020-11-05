@@ -1,77 +1,52 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const BearerStrategy = require('passport-http-bearer').Strategy;
 const usersService = require('../users/user.service');
+const { JWT_SECRET_KEY } = require('../../common/config');
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-passport.use(
-  new LocalStrategy(
-    { usernameField: 'login', passwordField: 'password' },
-    async (username, password, done) => {
-      try {
-        const user = await usersService.checkLogin(username, password);
-        console.log(user);
-        if (!user) {
-          return done(null, false, {
-            message: 'Bad login/password combination'
-          });
+const OPTION = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: JWT_SECRET_KEY
+};
+
+const localPassport = () =>
+  passport.use(
+    new LocalStrategy(
+      { usernameField: 'login' },
+      async (username, password, done) => {
+        try {
+          const user = await usersService.getByKey('login', username);
+          if (!user) {
+            return done(null, false, {
+              message: 'Bad login/password combination'
+            });
+          }
+          const match = await usersService.verify(user, password);
+          if (!match) {
+            return done(null, false);
+          }
+          return done(null, user);
+        } catch (err) {
+          done(err);
         }
-        return done(null, user);
-      } catch (error) {
+      }
+    )
+  );
+
+const jwtPassport = () =>
+  passport.use(
+    new JwtStrategy(OPTION, async (payload, done) => {
+      try {
+        const user = await usersService.getId(payload.id);
+        if (user) {
+          return done(null, user);
+        }
         return done(null, false);
+      } catch (err) {
+        return done(err, false);
       }
-    }
-  )
-);
+    })
+  );
 
-passport.use(
-  new BearerStrategy(async (token, done) => {
-    if (!token) {
-      return done(null, false);
-    }
-    try {
-      const user = await usersService.getToken(token);
-      if (!user) {
-        return done(null, false);
-      }
-      return done(null, user, { scope: 'all' });
-    } catch (error) {
-      return done(null, false);
-    }
-  })
-);
-
-const login = (req, res, next) => {
-  passport.authenticate('bearer', { session: false }, (err, user) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).send('Unauthorized');
-    }
-    req.user = user;
-
-    return next();
-  })(req, res, next);
-};
-
-const loginLocal = (req, res, next) => {
-  passport.authenticate(
-    'local',
-    {
-      failureRedirect: '/login',
-      session: false
-    },
-    (err, user) => {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        res.status(401).send('Unauthorized');
-      }
-      res.user = user;
-      return next();
-    }
-  )(req, res, next);
-};
-
-module.exports = { login, loginLocal };
+module.exports = { localPassport, jwtPassport };

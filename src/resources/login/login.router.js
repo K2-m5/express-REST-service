@@ -1,29 +1,43 @@
-const router = require('express').Router();
+const passport = require('passport');
+const loginService = require('./login.service');
 const httpStatus = require('http-status-codes');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET_KEY } = require('../../common/config');
 
-const { login, loginLocal } = require('./login.service');
-const tokenService = require('../../utils/tokenService');
-const userService = require('../../resources/users/user.service');
-const User = require('../users/user.model');
+const allowUrl = ['/', '/doc', '/login'];
 
-router.route('/').post(loginLocal, async (req, res) => {
-  console.log('res.user', res.user);
-  if (!res.user) {
-    res
-      .statusCode(httpStatus.FORBIDDEN)
-      .send(httpStatus.getStatusCode(httpStatus.FORBIDDEN));
-  }
+const localStrategy = app => {
+  loginService.localPassport();
+  app.post('/login', (req, res, next) => {
+    passport.authenticate('local', {}, (err, user) => {
+      if (user) {
+        res.json({
+          token: jwt.sign({ id: user.id, login: user.login }, JWT_SECRET_KEY)
+        });
+      } else {
+        res.status(httpStatus.FORBIDDEN).send(err);
+      }
+    })(req, res, next);
+  });
+};
 
-  const user = await userService.getId(req.user.id);
+const jwtStrategy = app => {
+  loginService.jwtPassport();
 
-  if (!user) {
-    res
-      .statusCode(httpStatus.FORBIDDEN)
-      .send(httpStatus.getStatusCode(httpStatus.FORBIDDEN));
-  } else {
-    const token = tokenService.createToken(res.user);
-    res.send({ user: User.toResponse(user), token });
-  }
-});
+  app.use((req, res, next) => {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+      if (allowUrl.includes(req.url) || user) {
+        return next();
+      }
+      res.status(httpStatus.UNAUTHORIZED).send(err);
+    })(req, res, next);
+  });
+};
 
-module.exports = [router, login];
+const authRouter = app => {
+  app.use(passport.initialize());
+  localStrategy(app);
+  jwtStrategy(app);
+};
+
+module.exports = authRouter;

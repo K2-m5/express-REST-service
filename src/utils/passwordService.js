@@ -15,16 +15,7 @@ const hashPassword = async password => {
 };
 
 const checkPassword = async (password, hash) => {
-  return await bcrypt
-    .compare(password, hash)
-    .then(result => {
-      return result;
-    })
-    .catch(() => {
-      throw new ErrorHandler(HttpStatus.INTERNAL_SERVER_ERROR);
-    });
+  return await bcrypt.compare(password, hash);
 };
-module.exports = {
-  hashPassword,
-  checkPassword
-};
+
+module.exports = { hashPassword, checkPassword };

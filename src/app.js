@@ -6,12 +6,10 @@ const YAML = require('yamljs');
 const userRouter = require('./resources/users/user.router');
 const boardsRouter = require('./resources/boards/board.router');
 const tasksRouter = require('./resources/tasks/task.router');
-const loginRouter = require('./resources/login/login.router');
-const login = require('./resources/login/login.router');
+const authRouter = require('./resources/login/login.router');
 
 const { morgan, logger } = require('./middleware/logger');
 const { returnError } = require('./errorHandler/errorHandler');
-const passport = require('passport');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -19,7 +17,6 @@ const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 app.use(express.json());
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-app.use(passport.initialize());
 
 app.use(
   morgan(
@@ -38,11 +35,11 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-app.use('/users', login, userRouter);
-app.use('/boards', login, boardsRouter);
-app.use('/boards', login, tasksRouter);
-app.use('/login', loginRouter);
-app.use('*', login);
+authRouter(app);
+
+app.use('/users', userRouter);
+app.use('/boards', boardsRouter);
+app.use('/boards', tasksRouter);
 
 app.use((err, req, res, next) => {
   returnError(err, res);
